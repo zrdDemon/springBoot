@@ -1,0 +1,60 @@
+package ${package.ServiceImpl};
+
+import ${package.Entity}.${entity};
+import ${package.Mapper}.${table.mapperName};
+import ${package.Service}.${table.serviceName};
+
+import org.springframework.stereotype.Service;
+
+/**
+ * <p>
+ * $!{table.comment} 服务实现类
+ * </p>
+ *
+ * @author ${author}
+ * @since ${date}
+ */
+@Service("${table.serviceName}")
+public class ${table.serviceImplName} implements ${table.serviceName} {
+@Resource
+private ${table.mapperName} mapper;
+
+
+@Override
+public Integer insert(${entity} bean){
+        return mapper.insert(bean);
+        }
+
+
+@Override
+public Integer update(${entity} bean){
+        return mapper.update(bean);
+        }
+
+
+@Override
+public ${entity} getOne(Integer id){
+        return mapper.getOne(id);
+        }
+
+
+@Override
+public Integer delete(Integer id){
+        return mapper.delete(id);
+        }
+
+
+@Override
+public List<${entity}> select(${entity} queryObj){
+        return mapper.select(queryObj);
+        }
+
+
+@Override
+public Integer count(${entity} queryObj){
+        return mapper.count(queryObj);
+        }
+
+
+
+}

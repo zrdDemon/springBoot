@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="${package.Mapper}.${table.mapperName}">
+
+
+    #if(${baseResultMap})
+        <!-- 通用查询映射结果 -->
+        <resultMap id="BaseResultMap" type="${package.Entity}.${entity}">
+            #foreach($field in ${table.commonFields})##生成公共字段
+                <result column="${field.name}" property="${field.propertyName}"/>
+            #end
+            #foreach($field in ${table.fields})
+                #if(!${field.keyFlag})##生成普通字段
+                    <result column="${field.name}" property="${field.propertyName}"/>
+                #end
+            #end
+        </resultMap>
+    #end
+
+
+
+    #if(${baseResultMap})
+        <!-- 通用查询映射结果 -->
+        <sql id="select_column">
+            <trim suffixOverrides=",">
+                #foreach($field in ${table.commonFields})##生成公共字段
+                    t.${field.name} ,
+                #end
+                #foreach($field in ${table.fields})
+                    #if(!${field.keyFlag})##生成普通字段
+                        t.${field.name}  ,
+                    #end
+                #end
+            </trim>
+        </sql>
+
+    #end
+    #if(${baseColumnList})
+        <!-- 通用查询结果列 -->
+        <sql id="Base_Column_List">
+            #foreach($field in ${table.commonFields})
+            #if(${field.name} == ${field.propertyName})t.${field.name}#else${field.name} AS ${field.propertyName}#end,
+            #end
+            ${table.fieldNames}
+        </sql>
+
+    #end
+
+
+
+    #if(${baseResultMap})
+        <!-- 通用查询映射结果 -->
+        <sql id="select_where_clause">
+            <trim prefix="WHERE" prefixOverrides="AND |OR">
+                #foreach($field in ${table.commonFields})##生成公共字段
+                    <if test="${field.propertyName} != null and ${field.propertyName} != '' ">AND t.${field.name}=#{${field.propertyName}} </if>
+                #end
+                #foreach($field in ${table.fields})
+                    #if(!${field.keyFlag})##生成普通字段
+                        <if test="${field.propertyName} != null and ${field.propertyName} != '' ">AND t.${field.name}=#{${field.propertyName}} </if>
+                    #end
+                #end
+            </trim>
+        </sql>
+    #end
+
+
+
+    #if(${baseResultMap})
+
+        <update id="update" parameterType="${package.Entity}.${entity}">
+
+        UPDATE ${table.name} t
+        <trim prefix="SET" suffixOverrides=",">
+                #foreach($field in ${table.fields})
+                    #if(!${field.keyFlag})##生成普通字段
+                        <if test="${field.propertyName} != null "> t.${field.name}=#{${field.propertyName}} , </if>
+                    #end
+                #end
+        </trim>
+            WHERE ID = #{id}
+        </update>
+    #end
+
+
+    #if(${baseResultMap})
+        <!-- 通用查询映射结果 -->
+        <insert id="insert" parameterType="${package.Entity}.${entity}">
+            INSERT INTO  ${table.name}
+            <trim prefix="(" suffix=")" suffixOverrides=",">
+
+                #foreach($field in ${table.fields})
+                    #if(!${field.keyFlag})##生成普通字段
+                        <if test="${field.propertyName} != null  ">${field.name},</if>
+                    #end
+                #end
+            </trim>
+            <trim prefix="VALUES (" suffix=")" suffixOverrides=",">
+
+                #foreach($field in ${table.fields})
+                    #if(!${field.keyFlag})##生成普通字段
+                        <if test="${field.propertyName} != null  ">#{${field.propertyName}},</if>
+                    #end
+                #end
+            </trim>
+        </insert>
+    #end
+
+
+
+    <select id="getOne" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        SELECT
+        <include refid="select_column"/>
+        FROM ${table.name} t
+        WHERE t.ID = #{id}
+    </select>
+
+    <delete id="delete" parameterType="java.lang.Integer">
+        DELETE FROM ${table.name} WHERE ID = #{id}
+    </delete>
+
+    <select id="select" parameterType="${package.Entity}.${entity}" resultMap="BaseResultMap">
+        SELECT
+        <include refid="select_column"/>
+        FROM ${table.name} t
+        <include refid="select_where_clause"/>
+        ORDER BY ID DESC
+       #* <if test="pageIndex != null and pageSize != ''and pageIndex != '' and pageSize != null "> LIMIT #{pageIndex},#{pageSize} </if>*#
+    </select>
+
+    <select id="count" parameterType="${package.Entity}.${entity}" resultType="java.lang.Integer">
+        SELECT COUNT(ID) FROM ${table.name}  t
+        <include refid="select_where_clause"/>
+    </select>
+
+
+
+
+
+</mapper>
